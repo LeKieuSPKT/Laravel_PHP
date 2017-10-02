@@ -83,3 +83,130 @@ Route::get('blade', function(){
 Route::get('sayHello', ['as'=>'SayHello',
 	'uses'=>'MyController@sayHello'
 ]);
+
+Route::get('database', function(){
+	Schema::create('thongtin', function( $table){
+		$table->increments('id');
+		$table->string('email');
+		$table->string('phone');
+
+	});
+	echo "Đã tạo bảng thành công";
+});
+
+
+//queryBuilder
+
+Route::get('qb/get', function(){
+	$data = DB::table('users')->get();
+	//var_dump($data);
+	foreach($data as $row)
+	{
+		foreach($row as $key =>$value)
+		{
+			echo $key.":".$value."<br>";
+		}
+		echo "<hr>";
+	}
+});
+
+Route::get('qb/where', function(){
+	$data = DB::table('users')->where('id','=',2)->get();
+	//var_dump($data);
+	foreach($data as $row)
+	{
+		foreach($row as $key =>$value)
+		{
+			echo $key.":".$value."<br>";
+		}
+		echo "<hr>";
+	}
+});
+
+//select id, name,email...
+
+Route::get('pb/select', function(){
+	$data = DB::table('users')->select(['id','name','email'])->where('id',2)->get();
+	foreach($data as $row)
+	{
+		foreach($row as $key =>$value)
+		{
+			echo $key.":".$value."<br>";
+		}
+		echo "<hr>";
+	}
+});
+
+
+//Câu lệnh truy vấn select name as HoTen...
+
+Route::get('qb/raw', function(){
+	$data = DB::table('users')->select(DB::raw('name as hoten'))->where('id',2)->get();
+	foreach($data as $row)
+	{
+		foreach($row as $key =>$value)
+		{
+			echo $key.":".$value."<br>";
+		}
+		echo "<hr>";
+	}
+});
+
+
+Route::get('qb/update', function(){
+	DB::table('users')->where('id',1)->update(['name'=>'Doremon']);
+	echo "Đã update";
+});
+
+
+Route::get('qb/delete', function(){
+	DB::table('users')->where('id','=',1)->delete();
+	echo "Đã xóa";
+});
+
+
+//Model
+//
+Route::get('model/save', function(){
+	$user = new App\User();
+	$user->name = "Mai";
+	$user->email = "Mai@email.com";
+	$user->password = "Mat khau";
+
+	$user->save();
+
+	echo "Đã thực hiện save";
+});
+
+
+Route::get('model/query', function(){
+	$user = App\User::find(4);
+	echo $user->name;
+});
+
+
+Route::get('model/thongtin/save/{email}', function($email){
+	$sanpham = new App\SanPham();
+	$sanpham->email = $email;
+	$sanpham->phone = "0987653256";
+
+	$sanpham->save();
+
+	echo "Đã thực hiện lệnh save ".$email;
+});
+
+Route::get('model/thongtin/all', function(){
+	$sanpham = App\SanPham::all()->toArray();
+	var_dump($sanpham);
+});
+
+
+Route::get('model/sanpham/ten', function(){
+	$sanpham = App\SanPham::where('email','k@gmail.com')->get()->toArray();
+	echo $sanpham[0]['email'];
+});
+
+Route::get('model/sanpham/delete', function(){
+	App\SanPham::destroy(1);
+});
+
